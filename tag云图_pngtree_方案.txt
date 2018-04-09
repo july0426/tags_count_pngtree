@@ -1,0 +1,26 @@
+    tag 云图--利用pngtree热点数据 方案:
+
+        编程语言:Python
+        存储方案:redis + MySQL
+
+1.每天从pngtree网站的4个入口进行采集,每个入口3个分类,每张图片2部分tag
+每个部分都进行单独的统计,累计20个数据集
+
+2.每个数据集建立一张数据表,存储在redis上.
+利用redis  有序集合 ,进行每个tag的频率统计
+
+3.采集完成一个数据集,就把数据转存到本地MySQL中
+数据表:tag_pngtree_count
+
+4.把每张图片的tags和url存在mysql中,每天爬取时先访问mysql,
+有数据就不进行HTTP请求,
+没有的话进行抓取,并存入mysql.
+数据表:pngtree_hot_tags
+
+文件功能说明:
+dao.py   自己封装的MySQL操作类,现在支持更新,插入,查询
+tag_count.py   包含一个类:pngtree  根据条件爬取指定类别下的热门图片的tag数据,最终存入MySQL中
+main.py   负责运行的文件. 根据需求实例化10个pngtree的类,依次进行爬取,把这个Python main.py加入crontab,每天00:00执行
+
+
+
